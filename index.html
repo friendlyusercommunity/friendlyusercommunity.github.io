@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>FUC Events</title>
+</head>
+<body>
+  <ul id="app">
+    <template v-for="event in time">
+      <li>
+        {{event.name}} is {{now.to(event.moment)}} on {{event.moment.local().format('ddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <a v-if="event.link" :href="event.link">Sign Up</a>
+      </li>
+    </li>
+  </ul>
+  </template>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.16.0/moment.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js'></script>
+  <script>
+    var app = new Vue({
+      el: '#app',
+
+      data: {
+        events: [
+          {
+            name: "Overwatch Random Team Tournament",
+            time: "11-19-2016 8:00 PM GMT"
+          },
+          {
+            name: "Hardcore Survival PVE",
+            time: "11-20-2016 7:00 PM GMT"
+          },
+          {
+            name: "Minecraft: Hunger Games",
+            time: "11-26-2016 8:00 PM GMT",
+            link: "http://challonge.com/tournaments/signup/uLJai4CZKA"
+          },
+          {
+            name: "Minecraft: Spleef - 2v2",
+            time: "11-27-2016 8:00 PM GMT"
+          }
+        ],
+        now: moment()
+      },
+
+      created: function(){
+        console.log(_.sortBy(this.events, "moment"));
+        for(i = this.events.length - 1; i >= 0; i--){
+          this.events[i].moment = moment(this.events[i].time);
+        }
+      },
+      computed: {
+        time: function(){return _.sortBy(this.events, "moment")}
+      }
+    });
+  </script>
+</body>
+</html>
