@@ -42,6 +42,7 @@
       position: relative;
       height: 100%;
       width: 100%;
+      padding: .25em;
     }
 
     .eventList article header{
@@ -62,8 +63,13 @@
 
     .eventList article main{
       position: absolute;
-      bottom: 0;
-      left: 0;
+      bottom: .25em;
+      left: .25em;
+      right: .25em;
+    }
+
+    .eventList article aside{
+      float: right;
     }
   </style>
   <h2>FUC February Game Nights</h2>
@@ -75,7 +81,7 @@
           <header>
             {{event.name}} <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
           </header>
-           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <a v-if="event.link" :href="event.link">Sign Up</a></main>
+           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event.host}}</aside><a v-if="event.link" :href="event.link">Sign Up</a></main>
         </article>
       </li>
     </li>
