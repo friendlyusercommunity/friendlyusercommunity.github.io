@@ -75,13 +75,13 @@
   <h2>FUC February Game Nights</h2>
 
   <ul id="app" class="eventList">
-    <template v-for="event in time">
+    <template v-if="!loading" v-for="event in events">
       <li>
         <article>
           <header>
-            {{event.name}} <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
+            {{event['gsx$name']['$t']}} <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
           </header>
-           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event.host}}</aside><a v-if="event.link" :href="event.link">Sign Up</a></main>
+           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside><a v-if="event['gsx$link']" :href="event['gsx$link']['$t']">Sign Up</a></main>
         </article>
       </li>
     </li>
@@ -91,170 +91,14 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
   <script>
-    window.events =  [
-      {
-        name: "Tricky Towers Game Night",
-        time: "2017-Mar-01 11:00 PM",
-        host: "Lewis"
-      },
-      {
-        name: "Jackbox Party Pack Game Night",
-        time: "2017-Mar-02 03:00 AM",
-        host: "Ercrd"
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-3 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Tower Unite Game Night",
-        time: "2017-Mar-4 10:00 PM",
-        host: "Bryce"
-      },
-      {
-        name: "Starbound Game Night",
-        time: "2017-Mar-5 10:00 PM",
-        host: "Marmarru"
-      },
-      {
-        name: "Cytube Video Night - Time TBA",
-        time: "2017-Mar-5 07:00 PM",
-        host: "Lil Dip"
-      },
-      {
-        name: "Overwatch Game Night",
-        time: "2017-Mar-6 08:00 PM",
-        host: "Catpun"
-      },
-      {
-        name: "Drawful 2 Game Night",
-        time: "2017-Mar-7 12:00 AM",
-        host: "Cute Price"
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-8 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-9 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Smash Brothers Game Night",
-        time: "2017-Mar-10 10:00 PM",
-        host: "FluffyMetroid"
-      },
-      {
-        name: "Rust Game Night",
-        time: "2017-Mar-11 08:00 PM",
-        host: "Spaztika"
-      },
-      {
-        name: "Don't Starve Game Night",
-        time: "2017-Mar-12 07:00 PM",
-        host: "Silvia"
-      },
-      {
-        name: "Smash Brothers Game Night",
-        time: "2017-Mar-13 10:00 PM",
-        host: "Bryce"
-      },
-      {
-        name: "Golf With Your Friends Game Night",
-        time: "2017-Mar-14 11:00 PM",
-        host: "Slopdog"
-      },
-      {
-        name: "GTA5 Game Night",
-        time: "2017-Mar-15 10:00 PM",
-        host: "Rusty"
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-16 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-17 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Overwatch Game Night",
-        time: "2017-Mar-18 08:00 PM",
-        host: "Finn"
-      },
-      {
-        name: "Duck Game Game Night",
-        time: "2017-Mar-19 12:00 AM",
-        host: "Fluff"
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-20 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-21 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-22 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-23 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-24 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Terraria Game Night",
-        time: "2017-Mar-25 09:00 PM",
-        host: "Arphenion"
-      },
-      {
-        name: "Lethal League Game Night",
-        time: "2017-Mar-26 07:00 PM",
-        host: "Christian"
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-27 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-28 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-29 07:00 PM",
-        host: ""
-      },
-      {
-        name: "Game Night",
-        time: "2017-Mar-30 07:00 PM",
-        host: ""
-      }
-    ];
-
     var app = new Vue({
       el: '#app',
-
       data: {
-        events: window.events,
+        SHEET_ID: '11UXThup1CBvo-CcowJ8E_4KY2JBMpiv5DS09BzqSLis',
+        loading: true,
+        events: null,
         now: moment(),
         pastMoment: moment().add(-2, "hours"),
         aux: function(moment){
@@ -272,17 +116,28 @@
       },
 
       created: function(){
-        console.log(_.sortBy(this.events, "moment"));
-        for(i = this.events.length - 1; i >= 0; i--){
-          this.events[i].moment = moment.tz(this.events[i].time, 'YYYY-MMM-DD HH:mm A', "GMT");
+        this.fetchData();
+      },
+      methods: {
+        fetchData: function(){
+          var that = this;
+          this.loading = true;
+          $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/od6/public/values?alt=json', function(d, err){
+            var events = d.feed.entry;
+            for(i = events.length - 1; i >= 0; i--){
+              events[i].moment = moment.tz(events[i]['gsx$time']['$t'], 'YYYY-MMM-DD HH:mm A', "GMT");
+            }
+            that.events = events;
+            that.loading = false;
+            console.log(that.events);
+          });
         }
       },
-
       computed: {
         time: function(){return _.sortBy(this.filteredEvents, "moment")},
         filteredEvents: function(){
           return this.events.filter(function(event){
-            return event.host !== ""
+            return event['gsx$host']['$t'] !== ""
           });
         }
       }
