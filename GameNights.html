@@ -20,6 +20,11 @@
       text-align: center;
     }
 
+    .loading{
+      width: 100%;
+      text-align: center;
+    }
+
     .eventList{
       padding: 0;
       margin: auto;
@@ -61,6 +66,10 @@
       color: red;
     }
 
+    .eventList article header a.link{
+      margin-left: .25em;
+    }
+
     .eventList article main{
       position: absolute;
       bottom: .25em;
@@ -75,14 +84,16 @@
   <h2>FUC February Game Nights</h2>
 
   <ul id="app" class="eventList">
-    <span v-if="loading">Loading...</span>
+    <span class="loading" v-if="loading">Loading...</span>
     <template v-if="!loading" v-for="event in events">
       <li>
         <article>
           <header>
-            {{event['gsx$name']['$t']}} <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
+            {{event['gsx$name']['$t']}}
+            <a class='link' v-if="event['gsx$link']['$t'] && event['gsx$linktext']['$t']" :href="event['gsx$link']['$t']">{{event['gsx$linktext']['$t']}}</a>
+            <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
           </header>
-           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside><a v-if="event['gsx$link']['$t']" :href="event['gsx$link']['$t']">Sign Up</a></main>
+           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside></main>
         </article>
       </li>
     </li>
