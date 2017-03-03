@@ -75,13 +75,14 @@
   <h2>FUC February Game Nights</h2>
 
   <ul id="app" class="eventList">
+    <span v-if="loading">Loading...</span>
     <template v-if="!loading" v-for="event in events">
       <li>
         <article>
           <header>
             {{event['gsx$name']['$t']}} <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
           </header>
-           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside><a v-if="event['gsx$link']" :href="event['gsx$link']['$t']">Sign Up</a></main>
+           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside><a v-if="event['gsx$link']['$t']" :href="event['gsx$link']['$t']">Sign Up</a></main>
         </article>
       </li>
     </li>
@@ -125,7 +126,7 @@
           $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/od6/public/values?alt=json', function(d, err){
             var events = d.feed.entry;
             for(i = events.length - 1; i >= 0; i--){
-              events[i].moment = moment.tz(events[i]['gsx$time']['$t'], 'YYYY-MMM-DD HH:mm A', "GMT");
+              events[i].moment = moment.tz(events[i]['gsx$time']['$t'], 'YYYY-MMM-DD HH:mm', "GMT");
             }
             that.events = events;
             that.loading = false;
