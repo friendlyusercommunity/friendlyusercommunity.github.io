@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>FUC Events</title>
-</head>
-<body>
   <style>
     body{
       background: #070707;
       font-size: 12px;
       color: white;
+      font-family: sans;
     }
 
     *{
@@ -32,6 +31,21 @@
       display: flex;
       flex-flow: column;
       justify-content: space-around;
+      position: relative;
+    }
+
+    .eventList.past:after{
+      content: '';
+      position:absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: rgb(0,0,0);
+      background: -moz-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0, 0, 0, 0) 50%);
+      background: -webkit-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0, 0, 0, 0) 50%);
+      background: linear-gradient(to bottom, rgba(0,0,0,1) 0%,rgba(0, 0, 0, 0) 50%);
     }
 
     .eventList li{
@@ -69,21 +83,17 @@
       float: right;
     }
 
-    .eventList article header span.now{
+    .eventList.now article header span{
       color: green;
     }
 
-    .eventList article header span.past{
+    .eventList.past article header span{
       color: red;
     }
 
     .eventList article header a.link{
       margin-left: .25em;
       color: #070707;
-    }
-
-    .eventList article header a.link:hover{
-
     }
 
     .eventList article main{
@@ -95,54 +105,52 @@
       float: right;
     }
   </style>
+</head>
+<body>
   <header>
     <img src="img/eventsheader.png">
   </header>
-
-  <ul id="app" class="eventList">
+  <div id="app">
     <span class="loading" v-if="loading">Loading...</span>
-    <template v-if="!loading" v-for="event in events">
-      <li>
-        <article>
-          <header>
-            <h3>{{event['gsx$name']['$t']}}</h3>
-            <a class='link' v-if="event['gsx$link']['$t'] && event['gsx$linktext']['$t']" :href="event['gsx$link']['$t']">{{event['gsx$linktext']['$t']}}</a>
-            <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
-          </header>
-           <main>{{event.moment.local().format('dddd')}} at {{event.moment.local().format('h:mm:ss A')}}. <aside>Hosted by: {{event['gsx$host']['$t']}}</aside></main>
-        </article>
-      </li>
-    </li>
-  </ul>
-  </template>
+    <event-list v-bind:events="pastEvents" class="past"></event-list>
+    <event-list v-bind:events="currentEvents" class="now"></event-list>
+    <event-list v-bind:events="upcomingEvents" ></event-list>
+  </div>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
   <script>
+    Vue.component('event-list', {
+      template: '<ul class="eventList">' +
+                '    <li v-for="event in events">' +
+                '      <article>' +
+                '        <header>' +
+                '          <h3>{{event[\'gsx$name\'][\'$t\']}}</h3>' +
+                '          <a class=\'link\' v-if="event[\'gsx$link\'][\'$t\'] && event[\'gsx$linktext\'][\'$t\']" :href="event[\'gsx$link\'][\'$t\']">{{event[\'gsx$linktext\'][\'$t\']}}</a>' +
+                '          <span class="{{event.class}}">{{event.to}}</span>' +
+                '        </header>' +
+                '         <main>{{event.moment.local().format(\'dddd\')}} at {{event.moment.local().format(\'h:mm:ss A\')}}. <aside>Hosted by: {{event[\'gsx$host\'][\'$t\']}}</aside></main>' +
+                '      </article>' +
+                '    </li>' +
+                '  </li>' +
+                '</ul>',
+      props: ['events']
+    });
+
     var app = new Vue({
       el: '#app',
       data: {
         SHEET_ID: '11UXThup1CBvo-CcowJ8E_4KY2JBMpiv5DS09BzqSLis',
         loading: true,
         events: null,
+        currentEvents: null,
+        pastEvents: null,
+        upcomingEvents: null,
         now: moment(),
-        pastMoment: moment().add(-2, "hours"),
-        aux: function(moment){
-          return moment >= this.pastMoment ? "is" : "was";
-        },
-        until: function(moment){
-          if(moment > this.now){
-            return this.now.to(moment, true);
-          } else if(moment >= this.pastMoment){
-            return "NOW";
-          } else {
-            return this.now.to(moment);
-          }
-        }
+        pastMoment: moment().add(-2, "hours")
       },
-
       created: function(){
         this.fetchData();
       },
@@ -152,17 +160,40 @@
           this.loading = true;
           $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/od6/public/values?alt=json', function(d, err){
             var events = d.feed.entry;
+            var pastEvents = [];
+            var upcomingEvents = [];
+            var currentEvents = [];
             for(i = events.length - 1; i >= 0; i--){
               events[i].moment = moment.tz(events[i]['gsx$time']['$t'], 'YYYY-MMM-DD HH:mm', "GMT");
+              if(events[i].moment > that.now){
+                events[i].to = that.now.to(events[i].moment, true);
+                upcomingEvents.push(events[i]);
+              } else if(events[i].moment >= that.pastMoment){
+                events[i].to = "NOW";
+                currentEvents.push(events[i]);
+              } else {
+                events[i].to = that.now.to(events[i].moment);
+                pastEvents.push(events[i]);
+              }
             }
-            that.events = events;
+
+            that.events = that.momentSort(events);
+            that.upcomingEvents = that.momentSort(upcomingEvents);
+            that.currentEvents = that.momentSort(currentEvents);
+            that.pastEvents = that.momentSort(pastEvents).slice(pastEvents.length - 3);
             that.loading = false;
-            console.log(that.events);
+            console.log(that.loading);
+            console.log(events);
           });
+        },
+        momentSort: function(events){
+          return _.sortBy(events, "moment");
+        },
+        aux: function(moment){
+          return moment >= this.pastMoment ? "is" : "was";
         }
       },
       computed: {
-        time: function(){return _.sortBy(this.filteredEvents, "moment")},
         filteredEvents: function(){
           return this.events.filter(function(event){
             return event['gsx$host']['$t'] !== ""
