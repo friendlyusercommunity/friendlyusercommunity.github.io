@@ -103,11 +103,12 @@
       display: block;
     }
 
-    .badgeList article main .type{
+    .badgeList article header .type{
       position: absolute;
-      padding: .25em .5em;
+      padding: .25em;
+      font-size: .75em;
       right: 0;
-      bottom: 0;
+      top: 0;
     }
 
     .badgeList article header a.link{
@@ -194,10 +195,10 @@
                 '        <header>' +
                 '          <aside><img v-bind:src="\'https://friendlyuser.community/\' + badge[\'gsx$image\'][\'$t\']"></aside>' +
                 '          <h3>{{badge[\'gsx$name\'][\'$t\']}}</h3>' +
+                '          <span class="type">{{badge[\'gsx$type\'][\'$t\']}}</span>' +
                 '        </header>' +
                 '        <main>' +
                 '          <span class="description">{{badge[\'gsx$description\'][\'$t\']}}</span>' +
-                '          <span class="type">{{badge[\'gsx$type\'][\'$t\']}}</span>' +
                 '        </main>' +
                 '      </article>' +
                 '    </li>' +
