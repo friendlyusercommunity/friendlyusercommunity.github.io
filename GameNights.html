@@ -7,7 +7,7 @@
 <body>
   <style>
     body{
-      background: black;
+      background: #070707;
       font-size: 12px;
       color: white;
     }
@@ -16,8 +16,9 @@
       box-sizing: border-box;
     }
 
-    h2{
-      text-align: center;
+    body > header img{
+      margin: auto;
+      display: block;
     }
 
     .loading{
@@ -40,18 +41,28 @@
       margin: .5em auto;
       font-size: 1em;
       color: white;
-      border: 1px solid white;
     }
 
     .eventList article{
       position: relative;
+      overflow: hidden;
       height: 100%;
       width: 100%;
-      padding: .25em;
+      border-radius: .5em;
+      border: .2em solid white;
     }
 
     .eventList article header{
       font-size: 1.5em;
+      color: black;
+      background-color: #dbae62;
+      padding: .25em;
+    }
+
+    .eventList article header h3{
+      padding: 0;
+      margin: 0;
+      display: inline;
     }
 
     .eventList article header span{
@@ -68,20 +79,25 @@
 
     .eventList article header a.link{
       margin-left: .25em;
+      color: #070707;
+    }
+
+    .eventList article header a.link:hover{
+
     }
 
     .eventList article main{
-      position: absolute;
-      bottom: .25em;
-      left: .25em;
-      right: .25em;
+      //position: absolute;
+      padding: .25em .5em;
     }
 
     .eventList article aside{
       float: right;
     }
   </style>
-  <h2>FUC Events</h2>
+  <header>
+    <img src="img/eventsheader.png">
+  </header>
 
   <ul id="app" class="eventList">
     <span class="loading" v-if="loading">Loading...</span>
@@ -89,7 +105,7 @@
       <li>
         <article>
           <header>
-            {{event['gsx$name']['$t']}}
+            <h3>{{event['gsx$name']['$t']}}</h3>
             <a class='link' v-if="event['gsx$link']['$t'] && event['gsx$linktext']['$t']" :href="event['gsx$link']['$t']">{{event['gsx$linktext']['$t']}}</a>
             <span v-bind:class="{past: event.moment <= pastMoment, now: event.moment < now && event.moment >= pastMoment}">{{until(event.moment)}}</span>
           </header>
