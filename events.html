@@ -2,6 +2,7 @@
 <html >
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=500">
   <title>FUC Events</title>
   <style>
     body{
@@ -9,6 +10,8 @@
       font-size: 12px;
       color: white;
       font-family: sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
     *{
@@ -83,6 +86,7 @@
       display: inline;
       display: inline-block;
       width: 20em;
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -114,6 +118,37 @@
     .eventList article aside{
       float: right;
     }
+
+    @media (max-width:500px){
+      body{
+        font-size: 24px;
+      }
+
+      .eventList article{
+        border-radius: 0;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+      }
+
+      .eventList:first-child li:first-child article{
+        border-top: none;
+      }
+
+      .eventList:last-child li:last-child article{
+        border-bottom: none;
+      }
+
+      .eventList article header span, .eventList article aside{
+        float: none;
+      }
+
+      .eventList li{
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -139,7 +174,7 @@
                 '        <header>' +
                 '          <h3>{{event[\'gsx$name\'][\'$t\']}}</h3>' +
                 '          <a class=\'link\' v-if="event[\'gsx$link\'][\'$t\'] && event[\'gsx$linktext\'][\'$t\']" :href="event[\'gsx$link\'][\'$t\']">{{event[\'gsx$linktext\'][\'$t\']}}</a>' +
-                '          <span class="{{event.class}}">{{event.to}}</span>' +
+                '          <span>{{event.to}}</span>' +
                 '        </header>' +
                 '         <main>{{event.moment.local().format(\'dddd\')}} at {{event.moment.local().format(\'h:mm:ss A\')}}. <aside>Hosted by: {{event[\'gsx$host\'][\'$t\']}}</aside></main>' +
                 '      </article>' +
