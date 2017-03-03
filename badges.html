@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>FUC Badgess</title>
+  <style>
+    body{
+      background: #070707;
+      font-size: 12px;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    body > header img{
+      margin: auto;
+      display: block;
+    }
+
+    header h2{
+      text-align: center;
+    }
+
+    #app{
+      width: 100%;
+    }
+
+    .loading{
+      width: 100%;
+      text-align: center;
+    }
+
+    .badgeList{
+      padding: 0;
+      margin: auto;
+      display: flex;
+      flex-flow: column;
+      justify-content: space-around;
+      position: relative;
+    }
+
+    .badgeList li{
+      display: block;
+      width: 40em;
+      //height: 5em;
+      margin: .5em auto;
+      font-size: 1em;
+      color: white;
+    }
+
+    input{
+      width: 26.666em;
+      font-size: 1.5em;
+      line-height: 2em;
+      display: block;
+      margin: auto;
+    }
+
+    .badgeList article{
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      border-radius: .5em;
+      border: .2em solid white;
+    }
+
+    .badgeList article header{
+      font-size: 1.5em;
+      color: black;
+      background-color: #dbae62;
+      padding: .25em;
+      height: 3em;
+    }
+
+    .badgeList article header h3{
+      padding: 0;
+      margin: 0;
+      display: inline;
+      display: inline-block;
+      width: 20em;
+      max-width: 80%;
+      max-width: calc(100% - 3em);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1em;
+      line-height: 2.5em;
+    }
+
+    .badgeList article header span{
+      float: right;
+    }
+
+    .badgeList article main span{
+      display: block;
+    }
+
+    .badgeList article main .type{
+      position: absolute;
+      right: 0;
+      bottom: 0;
+    }
+
+    .badgeList article header a.link{
+      margin-left: .25em;
+      color: #070707;
+    }
+
+    .badgeList article main{
+      //position: absolute;
+      padding: .25em .5em;
+    }
+
+    .badgeList article header aside{
+      width: 2.5em;
+      height: 2.5em;
+      display: inline-block;
+    }
+
+    .badgeList article header aside img{
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width:500px){
+      body{
+      }
+
+      body > header img{
+        width: 90%;
+        margin-bottom: -30px;
+        z-index: 2;
+        position: relative;
+        image-rendering: pixelated;
+      }
+
+      .badgeList article{
+        border-radius: 0;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+      }
+
+      .badgeList:first-child li:first-child article{
+        border-top: none;
+      }
+
+      .badgeList:last-child li:last-child article{
+        border-bottom: none;
+      }
+
+      .badgeList article header span, .badgeList article aside{
+        float: none;
+        display: block;
+      }
+
+      .badgeList li{
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- <img src="img/badgesheader.png"> -->
+    <h2>Badges</h2>
+  </header>
+  <div id="app">
+    <h3 class="loading" v-if="loading">Loading...</h3>
+    <input vif="!loading" v-model="search" placeholder="Search...">
+    <badge-list v-if="!loading" v-bind:badges="filteredBadges"></badge-list>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  <script>
+    Vue.component('badge-list', {
+      template: '<ul class="badgeList">' +
+                '    <li v-for="badge in badges">' +
+                '      <article>' +
+                '        <header>' +
+                '          <aside><img v-bind:src="\'https://friendlyuser.community/\' + badge[\'gsx$image\'][\'$t\']"></aside>' +
+                '          <h3>{{badge[\'gsx$name\'][\'$t\']}}</h3>' +
+                '        </header>' +
+                '        <main>' +
+                '          <span class="description">{{badge[\'gsx$description\'][\'$t\']}}</span>' +
+                '          <span class="type">{{badge[\'gsx$type\'][\'$t\']}}</span>' +
+                '        </main>' +
+                '      </article>' +
+                '    </li>' +
+                '  </li>' +
+                '</ul>',
+      props: ['badges']
+    });
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        SHEET_ID: '11UXThup1CBvo-CcowJ8E_4KY2JBMpiv5DS09BzqSLis',
+        loading: true,
+        badges: null,
+        search: '',
+      },
+      created: function(){
+        this.fetchData();
+      },
+      methods: {
+        fetchData: function(){
+          var that = this;
+          this.loading = true;
+          $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/2/public/values?alt=json', function(d, err){
+            var badges = d.feed.entry;
+            that.badges = badges;
+            console.log(badges);
+            that.loading = false;
+          });
+        }
+      },
+      computed: {
+        filteredBadges: function(){
+          var search = new RegExp(this.search, "i");
+          if(!this.search)
+            return this.badges;
+          return this.badges.filter(function(badge){
+            return search.test(badge['gsx$name']['$t'] + badge['gsx$description']['$t']);
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -211,7 +211,7 @@
         fetchData: function(){
           var that = this;
           this.loading = true;
-          $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/od6/public/values?alt=json', function(d, err){
+          $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/1/public/values?alt=json', function(d, err){
             var events = d.feed.entry;
             var pastEvents = [];
             var upcomingEvents = [];
