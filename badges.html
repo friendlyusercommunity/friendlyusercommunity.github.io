@@ -179,7 +179,7 @@
   </header>
   <div id="app">
     <h3 class="loading" v-if="loading">Loading...</h3>
-    <input vif="!loading" v-model="search" placeholder="Search...">
+    <input vif="!loading" v-on:input="debounceInput" v-model="search" placeholder="Search...">
     <badge-list v-if="!loading" v-bind:badges="filteredBadges"></badge-list>
   </div>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js'></script>
@@ -238,11 +238,15 @@
         loading: true,
         badges: null,
         search: '',
+        debouncedSearch: ''
       },
       created: function(){
         this.fetchData();
       },
       methods: {
+        debounceInput: _.debounce(function () {
+          this.debouncedSearch = this.search;
+        }, 250),
         fetchData: function(){
           var that = this;
           this.loading = true;
@@ -256,8 +260,8 @@
       },
       computed: {
         filteredBadges: function(){
-          var search = new RegExp(this.search, "i");
-          if(!this.search)
+          var search = new RegExp(this.debouncedSearch, "i");
+          if(!this.debouncedSearch)
             return this.badges;
           return this.badges.filter(function(badge){
             return search.test(badge['gsx$name']['$t'] + badge['gsx$description']['$t']);
