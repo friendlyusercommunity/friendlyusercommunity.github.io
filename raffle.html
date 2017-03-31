@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>FUC Raffle</title>
+  <style>
+    body{
+      background: #070707;
+      font-size: 12px;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    body > header img{
+      margin: auto;
+      display: block;
+    }
+
+    #app{
+      width: 100%;
+    }
+
+    .loading{
+      width: 100%;
+      text-align: center;
+    }
+
+    .ticketList{
+      padding: 0;
+      margin: auto;
+      position: relative;
+      border-collapse: collapse;
+      width: 400px;
+    }
+    td, th{
+      text-align: left;
+    }
+
+    th{
+      font-weight: bold;
+    }
+
+    .ticketList.past:after{
+      content: '';
+      position:absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-tickets: none;
+      background: rgb(7,7,7);
+      background: -moz-linear-gradient(top, rgba(7,7,7,1) 0%,rgba(7,7,7,0) 50%);
+      background: -webkit-linear-gradient(top, rgba(7,7,7,1) 0%,rgba(7,7,7,0) 50%);
+      background: linear-gradient(to bottom, rgba(7,7,7,1) 0%,rgba(7,7,7,0) 50%);
+    }
+    .ticketList tr:nth-child(2n), .ticketList thead tr{
+      background: #222;
+    }
+
+    @media (max-width:500px){
+      .ticketList{
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/raffleheader.png">
+  </header>
+  <div id="app">
+    <h3 class="loading" v-if="loading">Loading...</h3>
+    <ticket-list v-if="!loading" v-bind:raffle="filteredRaffle"></ticket-list>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  <script>
+    Vue.component('ticket-list', {
+      template: '<table class="ticketList">' +
+                '  <thead>' +
+                '    <tr>' +
+                '      <th>#</th><th>Username</th>' +
+                '    </tr>' +
+                '  </thead>' +
+                '  <tbody>' +
+                '    <tr v-for="ticket in raffle">' +
+                '      <td class="ticket">{{ticket[\'gsx$ticket\'][\'$t\']}}</td><td class="username">{{ticket[\'gsx$username\'][\'$t\']}}</td>' +
+                '    </tr>' +
+                '  </tbody>' +
+                '</table>',
+      props: ['raffle']
+    });
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        SHEET_ID: '11UXThup1CBvo-CcowJ8E_4KY2JBMpiv5DS09BzqSLis',
+        loading: true,
+        raffle: null,
+      },
+      created: function created(){
+        this.fetchData();
+      },
+      methods: {
+        fetchData: function fetchData(){
+          var that = this;
+          this.loading = true;
+          $.getJSON('https://spreadsheets.google.com/feeds/list/' + this.SHEET_ID + '/3/public/values?alt=json', function(d, err){
+            var raffle = d.feed.entry;
+            that.raffle = raffle;
+            that.loading = false;
+          });
+        }
+      },
+      computed: {
+        filteredRaffle: function filteredRaffle(){
+          return this.raffle.filter(function(ticket){
+            return ticket['gsx$username']['$t'] !== "";
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
